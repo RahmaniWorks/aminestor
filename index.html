@@ -1,0 +1,1126 @@
+
+The user wants me to create a modern, responsive e-commerce website called "Nadia Shop" with multiple pages and features. They've specified:
+
+1. Homepage with hero banner, featured products, special offers
+2. Product catalog with categories (Sunglasses, Skincare, Accessories)
+3. Product pages with images, descriptions, prices, Add to Cart
+4. Shopping cart and checkout with payment options
+5. About Us page
+6. Contact page with form and social links
+7. Mobile-friendly design with pastel colors (white, beige, light pink) and animations
+
+Since this needs to be a single HTML file with HTML, CSS, and JavaScript, I'll create a single-page application that uses JavaScript to handle navigation between different "pages" (sections). I'll use Tailwind CSS for styling as requested.
+
+Let me plan the structure:
+- Navigation bar
+- Home section (hero banner, featured products, special offers)
+- Products section (categorized products)
+- Cart section
+- About section
+- Contact section
+- Footer
+
+I'll use a pastel color palette with white, beige, and light pink as requested, and add smooth animations for transitions.
+
+
+`nadia-shop.html`
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nadia Shop - Modern E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-beige: #f5f5f0;
+            --secondary-pink: #ffd6e0;
+            --accent-pink: #ff9ebb;
+            --text-dark: #333333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-beige);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-pink), var(--secondary-pink));
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 158, 187, 0.3);
+        }
+
+        .cart-item {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(255,245,245,0.9) 0%, rgba(255,214,224,0.8) 100%);
+        }
+
+        .category-filter {
+            transition: all 0.3s ease;
+        }
+
+        .category-filter.active {
+            background-color: var(--secondary-pink);
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-pink-400">Nadia Shop</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="showSection('home')" class="text-gray-700 hover:text-pink-400 transition-colors">Home</button>
+                    <button onclick="showSection('products')" class="text-gray-700 hover:text-pink-400 transition-colors">Products</button>
+                    <button onclick="showSection('about')" class="text-gray-700 hover:text-pink-400 transition-colors">About</button>
+                    <button onclick="showSection('contact')" class="text-gray-700 hover:text-pink-400 transition-colors">Contact</button>
+                    <button onclick="showSection('cart')" class="relative">
+                        <i class="fas fa-shopping-cart text-gray-700 hover:text-pink-400 transition-colors"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-pink-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="showSection('home')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Home</button>
+                <button onclick="showSection('products')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Products</button>
+                <button onclick="showSection('about')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">About</button>
+                <button onclick="showSection('contact')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Contact</button>
+                <button onclick="showSection('cart')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Cart</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <!-- Hero Banner -->
+        <div class="hero-banner py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6">Welcome to Nadia Shop</h1>
+                    <p class="text-xl text-gray-600 mb-8">Discover beauty and style that speaks to you</p>
+                    <button onclick="showSection('products')" class="btn-primary text-white px-8 py-3 rounded-full font-semibold text-lg">
+                        Shop Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Products -->
+        <div class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Featured Products</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="product-card bg-white rounded-lg shadow-md p-6">
+                        <img src="https://placehold.co/400x300" alt="Luxury gold-rimmed cat-eye sunglasses with gradient pink lenses" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold mb-2">Premium Cat-Eye Sunglasses</h3>
+                        <p class="text-gray-600 mb-4">Elegant gold-rimmed sunglasses with UV protection</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-pink-400">$89.99</span>
+                            <button onclick="addToCart(1)" class="btn-primary text-white px-4 py-2 rounded">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg shadow-md p-6">
+                        <img src="https://placehold.co/400x300" alt="Skincare set with serum bottles, cream jars, and organic ingredients on marble background" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold mb-2">Luxury Skincare Set</h3>
+                        <p class="text-gray-600 mb-4">Complete skincare routine with natural ingredients</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-pink-400">$129.99</span>
+                            <button onclick="addToCart(2)" class="btn-primary text-white px-4 py-2 rounded">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg shadow-md p-6">
+                        <img src="https://placehold.co/400x300" alt="Minimalist leather handbag with gold hardware on beige background" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold mb-2">Designer Leather Handbag</h3>
+                        <p class="text-gray-600 mb-4">Minimalist design with premium leather quality</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-pink-400">$199.99</span>
+                            <button onclick="addToCart(3)" class="btn-primary text-white px-4 py-2 rounded">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Special Offers -->
+        <div class="py-16 bg-gradient-to-r from-pink-50 to-beige-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Special Offers</h2>
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                    <h3 class="text-2xl font-bold text-pink-400 mb-4">Summer Sale - 25% Off Everything!</h3>
+                    <p class="text-gray-600 mb-6">Use code SUMMER25 at checkout. Valid until August 31st.</p>
+                    <button onclick="showSection('products')" class="btn-primary text-white px-6 py-3 rounded-full font-semibold">
+                        Shop the Sale
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="section">
+        <div class="py-12 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Our Products</h1>
+                
+                <!-- Category Filters -->
+                <div class="flex justify-center space-x-4 mb-12">
+                    <button onclick="filterProducts('all')" class="category-filter active px-6 py-2 rounded-full border border-gray-300">All Products</button>
+                    <button onclick="filterProducts('sunglasses')" class="category-filter px-6 py-2 rounded-full border border-gray-300">Sunglasses</button>
+                    <button onclick="filterProducts('skincare')" class="category-filter px-6 py-2 rounded-full border border-gray-300">Skincare</button>
+                    <button onclick="filterProducts('accessories')" class="category-filter px-6 py-2 rounded-full border border-gray-300">Accessories</button>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
+                    <!-- Products will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cart" class="section">
+        <div class="py-12 bg-white min-h-screen">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Your Shopping Cart</h1>
+                
+                <div id="cart-items" class="space-y-6 mb-8">
+                    <!-- Cart items will be dynamically loaded here -->
+                    <div class="text-center py-12" id="empty-cart">
+                        <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-xl text-gray-500">Your cart is empty</p>
+                        <button onclick="showSection('products')" class="btn-primary text-white px-6 py-3 rounded-full mt-4">
+                            Start Shopping
+                        </button>
+                    </div>
+                </div>
+
+                <div id="cart-summary" class="hidden bg-gray-50 rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xl font-semibold">Subtotal:</span>
+                        <span id="cart-subtotal" class="text-2xl font-bold text-pink-400">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg">Shipping:</span>
+                        <span id="cart-shipping" class="text-lg">$9.99</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-xl font-semibold">Total:</span>
+                        <span id="cart-total" class="text-2xl font-bold text-pink-400">$0.00</span>
+                    </div>
+                    
+                    <button onclick="showSection('checkout')" class="btn-primary text-white w-full py-4 rounded-xl font-semibold text-lg">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Section -->
+    <section id="checkout" class="section">
+        <div class="py-12 bg-white min-h-screen">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Checkout</h1>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Order Summary -->
+                    <div class="bg-gray-50 rounded-2xl p-6">
+                        <h2 class="text-2xl font-semibold mb-4">Order Summary</h2>
+                        <div id="checkout-items"></div>
+                        <div class="border-t pt-4 mt-4">
+                            <div class="flex justify-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="checkout-subtotal">$0.00</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Shipping:</span>
+                                <span>$9.99</span>
+                            </div>
+                            <div class="flex justify-between font-semibold text-lg">
+                                <span>Total:</span>
+                                <span id="checkout-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <h2 class="text-2xl font-semibold mb-6">Payment Information</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="your@email.com">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="1234 5678 9012 3456">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Expiration Date</label>
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="MM/YY">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="123">
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <button onclick="processPayment()" class="btn-primary text-white w-full py-4 rounded-xl font-semibold text-lg">
+                                    Pay Now
+                                </button>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <p class="text-sm text-gray-600">or pay with</p>
+                                <div class="flex justify-center space-x-4 mt-2">
+                                    <button class="p-3 bg-blue-600 text-white rounded-lg">
+                                        <i class="fab fa-paypal"></i>
+                                    </button>
+                                    <button class="p-3 bg-gray-800 text-white rounded-lg">
+                                        <i class="fab fa-cc-stripe"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="py-20 bg-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Our Story</h1>
+                    <p class="text-xl text-gray-600">Where beauty meets purpose</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+                    <div>
+                        <img src="https://placehold.co/600x400" alt="Founder Nadia in a modern boutique setting with natural lighting and minimalist decor" class="rounded-2xl shadow-xl">
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-semibold mb-6">Meet Nadia</h2>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Founded in 2020, Nadia Shop began as a passion project by our founder Nadia, who believed that 
+                            everyone deserves access to high-quality, ethically sourced beauty and lifestyle products.
+                        </p>
+                        <p class="text-gray-600 leading-relaxed">
+                            What started as a small boutique has grown into a beloved destination for those who value 
+                            quality, sustainability, and timeless style.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-pink-50 to-beige-100 rounded-2xl p-12 text-center">
+                    <h2 class="text-3xl font-semibold mb-6">Our Mission</h2>
+                    <p class="text-xl text-gray-700 leading-relaxed">
+                        To empower individuals to express their unique style while making conscious choices that 
+                        benefit both people and the planet. We're committed to sustainability, ethical sourcing, 
+                        and creating products that last.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="py-20 bg-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Get in Touch</h1>
+                    <p class="text-xl text-gray-600">We'd love to hear from you</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-6">Contact Information</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-map-marker-alt text-pink-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Address</p>
+                                    <p class="text-gray-600">123 Beauty Street, Fashion District<br>New York, NY 10001</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-phone text-pink-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Phone</p>
+                                    <p class="text-gray-600">+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-pink-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Email</p>
+                                    <p class="text-gray-600">hello@nadiashop.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <h3 class="text-xl font-semibold mb-4">Follow Us</h3>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-instagram text-pink-400"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-facebook-f text-pink-400"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-twitter text-pink-400"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-pinterest text-pink-400"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-6">Send us a Message</h2>
+                        <form class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="Your name">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="your@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="Your message..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-semibold">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Nadia Shop</h3>
+                    <p class="text-gray-400">Where beauty meets purpose. Quality products for the conscious consumer.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Shop</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Sunglasses</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Skincare</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Accessories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping & Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Subscribe for updates and offers</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-lg flex-1 bg-gray-800 border border-gray-700">
+                        <button class="bg-pink-400 px-4 py-2 rounded-r-lg hover:bg-pink-500 transition-colors">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Nadia Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample product data
+        const products = [
+            { id: 1, name: "Premium Cat-Eye Sunglasses", price: 89.99, category: "sunglasses", image: "https://placehold.co/400x300", description: "Elegant gold-rimmed sunglasses with UV protection" },
+            { id: 2, name: "Luxury Skincare Set", price: 129.99, category: "skincare", image: "https://placehold.co/400x300", description: "Complete skincare routine with natural ingredients" },
+            { id: 3, name: "Designer Leather Handbag", price: 199.99, category: "accessories", image: "https://placehold.co/400x300", description: "Minimalist design with premium leather quality" },
+            { id: 4, name: "Aviator Sunglasses", price: 69.99, category: "sunglasses", image: "https://placehold.co/400x300", description: "Classic aviator style with polarized lenses" },
+            { id: 5, name: "Hydrating Face Serum", price: 49.99, category: "skincare", image: "https://placehold.co/400x300", description: "Deep hydration with hyaluronic acid" },
+            { id: 6, name: "Silk Scarf", price: 39.99, category: "accessories", image: "https://placehold.co/400x300", description: "Luxurious silk scarf with floral pattern" },
+            { id: 7, name: "Round Metal Sunglasses", price: 79.99, category: "sunglasses", image: "https://placehold.co/400x300", description: "Vintage-inspired round metal frames" },
+            { id: 8, name: "Night Cream", price: 59.99, category: "skincare", image: "https://placehold.co/400x300", description: "Overnight repair and rejuvenation" },
+            { id: 9, name: "Leather Wallet", price: 89.99, category: "accessories", image: "https://placehold.co/400x300", description: "Slim leather wallet with card slots" }
+        ];
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            updateCartCount();
+            setupMobileMenu();
+        });
+
+        // Mobile menu functionality
+        function setupMobileMenu() {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            
+            menuBtn.addEventListener('click', function() {
+                menu.classList.toggle('hidden');
+            });
+        }
+
+        // Section navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+
+```
+
+🎨 **Generating images based on descriptions...**
+
+✅ **Images generated successfully! Here's your updated content:**
+
+`nadia-shop.html`
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nadia Shop - Modern E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-beige: #f5f5f0;
+            --secondary-pink: #ffd6e0;
+            --accent-pink: #ff9ebb;
+            --text-dark: #333333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-beige);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-pink), var(--secondary-pink));
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 158, 187, 0.3);
+        }
+
+        .cart-item {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(255,245,245,0.9) 0%, rgba(255,214,224,0.8) 100%);
+        }
+
+        .category-filter {
+            transition: all 0.3s ease;
+        }
+
+        .category-filter.active {
+            background-color: var(--secondary-pink);
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-pink-400">Nadia Shop</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="showSection('home')" class="text-gray-700 hover:text-pink-400 transition-colors">Home</button>
+                    <button onclick="showSection('products')" class="text-gray-700 hover:text-pink-400 transition-colors">Products</button>
+                    <button onclick="showSection('about')" class="text-gray-700 hover:text-pink-400 transition-colors">About</button>
+                    <button onclick="showSection('contact')" class="text-gray-700 hover:text-pink-400 transition-colors">Contact</button>
+                    <button onclick="showSection('cart')" class="relative">
+                        <i class="fas fa-shopping-cart text-gray-700 hover:text-pink-400 transition-colors"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-pink-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="showSection('home')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Home</button>
+                <button onclick="showSection('products')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Products</button>
+                <button onclick="showSection('about')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">About</button>
+                <button onclick="showSection('contact')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Contact</button>
+                <button onclick="showSection('cart')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-pink-50 rounded">Cart</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <!-- Hero Banner -->
+        <div class="hero-banner py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6">Welcome to Nadia Shop</h1>
+                    <p class="text-xl text-gray-600 mb-8">Discover beauty and style that speaks to you</p>
+                    <button onclick="showSection('products')" class="btn-primary text-white px-8 py-3 rounded-full font-semibold text-lg">
+                        Shop Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Products -->
+        <div class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Featured Products</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="product-card bg-white rounded-lg shadow-md p-6">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c1b4652a-6a26-42d8-952a-7e585b714f99.png" alt="Luxury gold-rimmed cat-eye sunglasses with gradient pink lenses" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold mb-2">Premium Cat-Eye Sunglasses</h3>
+                        <p class="text-gray-600 mb-4">Elegant gold-rimmed sunglasses with UV protection</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-pink-400">$89.99</span>
+                            <button onclick="addToCart(1)" class="btn-primary text-white px-4 py-2 rounded">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg shadow-md p-6">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/eff04dc6-2b50-40bf-b811-af889150db0e.png" alt="Skincare set with serum bottles, cream jars, and organic ingredients on marble background" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold mb-2">Luxury Skincare Set</h3>
+                        <p class="text-gray-600 mb-4">Complete skincare routine with natural ingredients</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-pink-400">$129.99</span>
+                            <button onclick="addToCart(2)" class="btn-primary text-white px-4 py-2 rounded">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg shadow-md p-6">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/3420d49c-7bfc-4492-a3ee-30ea4979b38c.png" alt="Minimalist leather handbag with gold hardware on beige background" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="text-xl font-semibold mb-2">Designer Leather Handbag</h3>
+                        <p class="text-gray-600 mb-4">Minimalist design with premium leather quality</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-pink-400">$199.99</span>
+                            <button onclick="addToCart(3)" class="btn-primary text-white px-4 py-2 rounded">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Special Offers -->
+        <div class="py-16 bg-gradient-to-r from-pink-50 to-beige-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Special Offers</h2>
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                    <h3 class="text-2xl font-bold text-pink-400 mb-4">Summer Sale - 25% Off Everything!</h3>
+                    <p class="text-gray-600 mb-6">Use code SUMMER25 at checkout. Valid until August 31st.</p>
+                    <button onclick="showSection('products')" class="btn-primary text-white px-6 py-3 rounded-full font-semibold">
+                        Shop the Sale
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="section">
+        <div class="py-12 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Our Products</h1>
+                
+                <!-- Category Filters -->
+                <div class="flex justify-center space-x-4 mb-12">
+                    <button onclick="filterProducts('all')" class="category-filter active px-6 py-2 rounded-full border border-gray-300">All Products</button>
+                    <button onclick="filterProducts('sunglasses')" class="category-filter px-6 py-2 rounded-full border border-gray-300">Sunglasses</button>
+                    <button onclick="filterProducts('skincare')" class="category-filter px-6 py-2 rounded-full border border-gray-300">Skincare</button>
+                    <button onclick="filterProducts('accessories')" class="category-filter px-6 py-2 rounded-full border border-gray-300">Accessories</button>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
+                    <!-- Products will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cart" class="section">
+        <div class="py-12 bg-white min-h-screen">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Your Shopping Cart</h1>
+                
+                <div id="cart-items" class="space-y-6 mb-8">
+                    <!-- Cart items will be dynamically loaded here -->
+                    <div class="text-center py-12" id="empty-cart">
+                        <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-xl text-gray-500">Your cart is empty</p>
+                        <button onclick="showSection('products')" class="btn-primary text-white px-6 py-3 rounded-full mt-4">
+                            Start Shopping
+                        </button>
+                    </div>
+                </div>
+
+                <div id="cart-summary" class="hidden bg-gray-50 rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xl font-semibold">Subtotal:</span>
+                        <span id="cart-subtotal" class="text-2xl font-bold text-pink-400">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg">Shipping:</span>
+                        <span id="cart-shipping" class="text-lg">$9.99</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-xl font-semibold">Total:</span>
+                        <span id="cart-total" class="text-2xl font-bold text-pink-400">$0.00</span>
+                    </div>
+                    
+                    <button onclick="showSection('checkout')" class="btn-primary text-white w-full py-4 rounded-xl font-semibold text-lg">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Section -->
+    <section id="checkout" class="section">
+        <div class="py-12 bg-white min-h-screen">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Checkout</h1>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Order Summary -->
+                    <div class="bg-gray-50 rounded-2xl p-6">
+                        <h2 class="text-2xl font-semibold mb-4">Order Summary</h2>
+                        <div id="checkout-items"></div>
+                        <div class="border-t pt-4 mt-4">
+                            <div class="flex justify-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="checkout-subtotal">$0.00</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Shipping:</span>
+                                <span>$9.99</span>
+                            </div>
+                            <div class="flex justify-between font-semibold text-lg">
+                                <span>Total:</span>
+                                <span id="checkout-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <h2 class="text-2xl font-semibold mb-6">Payment Information</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="your@email.com">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="1234 5678 9012 3456">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Expiration Date</label>
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="MM/YY">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="123">
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <button onclick="processPayment()" class="btn-primary text-white w-full py-4 rounded-xl font-semibold text-lg">
+                                    Pay Now
+                                </button>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <p class="text-sm text-gray-600">or pay with</p>
+                                <div class="flex justify-center space-x-4 mt-2">
+                                    <button class="p-3 bg-blue-600 text-white rounded-lg">
+                                        <i class="fab fa-paypal"></i>
+                                    </button>
+                                    <button class="p-3 bg-gray-800 text-white rounded-lg">
+                                        <i class="fab fa-cc-stripe"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="py-20 bg-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Our Story</h1>
+                    <p class="text-xl text-gray-600">Where beauty meets purpose</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+                    <div>
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/365eb4f5-18a3-4e61-895a-3d631679890d.png" alt="Founder Nadia in a modern boutique setting with natural lighting and minimalist decor" class="rounded-2xl shadow-xl">
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-semibold mb-6">Meet Nadia</h2>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            Founded in 2020, Nadia Shop began as a passion project by our founder Nadia, who believed that 
+                            everyone deserves access to high-quality, ethically sourced beauty and lifestyle products.
+                        </p>
+                        <p class="text-gray-600 leading-relaxed">
+                            What started as a small boutique has grown into a beloved destination for those who value 
+                            quality, sustainability, and timeless style.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-pink-50 to-beige-100 rounded-2xl p-12 text-center">
+                    <h2 class="text-3xl font-semibold mb-6">Our Mission</h2>
+                    <p class="text-xl text-gray-700 leading-relaxed">
+                        To empower individuals to express their unique style while making conscious choices that 
+                        benefit both people and the planet. We're committed to sustainability, ethical sourcing, 
+                        and creating products that last.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="py-20 bg-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Get in Touch</h1>
+                    <p class="text-xl text-gray-600">We'd love to hear from you</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-6">Contact Information</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-map-marker-alt text-pink-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Address</p>
+                                    <p class="text-gray-600">123 Beauty Street, Fashion District<br>New York, NY 10001</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-phone text-pink-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Phone</p>
+                                    <p class="text-gray-600">+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-pink-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Email</p>
+                                    <p class="text-gray-600">hello@nadiashop.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <h3 class="text-xl font-semibold mb-4">Follow Us</h3>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-instagram text-pink-400"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-facebook-f text-pink-400"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-twitter text-pink-400"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center hover:bg-pink-200 transition-colors">
+                                    <i class="fab fa-pinterest text-pink-400"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-6">Send us a Message</h2>
+                        <form class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="Your name">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="your@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent" placeholder="Your message..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-semibold">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Nadia Shop</h3>
+                    <p class="text-gray-400">Where beauty meets purpose. Quality products for the conscious consumer.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Shop</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Sunglasses</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Skincare</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Accessories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping & Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Subscribe for updates and offers</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-lg flex-1 bg-gray-800 border border-gray-700">
+                        <button class="bg-pink-400 px-4 py-2 rounded-r-lg hover:bg-pink-500 transition-colors">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2024 Nadia Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample product data
+        const products = [
+            { id: 1, name: "Premium Cat-Eye Sunglasses", price: 89.99, category: "sunglasses", image: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4ed00007-8364-40cb-a3ff-81e4378d5eb0.png", description: "Elegant gold-rimmed sunglasses with UV protection" },
+            { id: 2, name: "Luxury Skincare Set", price: 129.99, category: "skincare", image: "https://placehold.co/400x300", description: "Complete skincare routine with natural ingredients" },
+            { id: 3, name: "Designer Leather Handbag", price: 199.99, category: "accessories", image: "https://placehold.co/400x300", description: "Minimalist design with premium leather quality" },
+            { id: 4, name: "Aviator Sunglasses", price: 69.99, category: "sunglasses", image: "https://placehold.co/400x300", description: "Classic aviator style with polarized lenses" },
+            { id: 5, name: "Hydrating Face Serum", price: 49.99, category: "skincare", image: "https://placehold.co/400x300", description: "Deep hydration with hyaluronic acid" },
+            { id: 6, name: "Silk Scarf", price: 39.99, category: "accessories", image: "https://placehold.co/400x300", description: "Luxurious silk scarf with floral pattern" },
+            { id: 7, name: "Round Metal Sunglasses", price: 79.99, category: "sunglasses", image: "https://placehold.co/400x300", description: "Vintage-inspired round metal frames" },
+            { id: 8, name: "Night Cream", price: 59.99, category: "skincare", image: "https://placehold.co/400x300", description: "Overnight repair and rejuvenation" },
+            { id: 9, name: "Leather Wallet", price: 89.99, category: "accessories", image: "https://placehold.co/400x300", description: "Slim leather wallet with card slots" }
+        ];
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            updateCartCount();
+            setupMobileMenu();
+        });
+
+        // Mobile menu functionality
+        function setupMobileMenu() {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            
+            menuBtn.addEventListener('click', function() {
+                menu.classList.toggle('hidden');
+            });
+        }
+
+        // Section navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+
+```
